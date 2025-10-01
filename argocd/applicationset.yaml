@@ -7,6 +7,18 @@ spec:
   generators:
   - matrix:
       generators:
+      - clusters:
+          selector:
+            matchLabels:
+              argocd.argoproj.io/secret-type: cluster
+      - list:
+          elements:
+          - environment: dev
+            namespace: microservices-demo-dev
+          - environment: staging
+            namespace: microservices-demo-staging
+          - environment: prod
+            namespace: microservices-demo-prod
       - list:
           elements:
           - service: frontend
@@ -14,20 +26,6 @@ spec:
           - service: database
           - service: redis
           - service: worker
-      - list:
-          elements:
-          - environment: dev
-            namespace: microservices-demo-dev
-            repoURL: https://github.com/example/microservices-demo
-            targetRevision: HEAD
-          - environment: staging
-            namespace: microservices-demo-staging
-            repoURL: https://github.com/example/microservices-demo
-            targetRevision: HEAD
-          - environment: prod
-            namespace: microservices-demo-prod
-            repoURL: https://github.com/example/microservices-demo
-            targetRevision: release
   template:
     metadata:
       name: '{{service}}-{{environment}}'
@@ -38,22 +36,22 @@ spec:
     spec:
       project: default
       source:
-        repoURL: '{{repoURL}}'
-        targetRevision: '{{targetRevision}}'
-        path: 'charts/{{service}}'
+        repoURL: https://github.com/JuliusOmoleye/microservices-demo.git
+        path: charts/{{service}}
+        targetRevision: '{{#eq environment "prod"}}release{{else}}HEAD{{/eq}}'
         helm:
           valueFiles:
-            - values.yaml
-            - '../environments/{{environment}}/{{service}}-values.yaml'
+          - values.yaml
+          - ../environments/{{environment}}/{{service}}-values.yaml
       destination:
-        server: https://kubernetes.default.svc
+        server: '{{server}}'
         namespace: '{{namespace}}'
       syncPolicy:
         automated:
           prune: true
           selfHeal: true
         syncOptions:
-          - CreateNamespace=true
+        - CreateNamespace=true
         retry:
           limit: 5
           backoff:
