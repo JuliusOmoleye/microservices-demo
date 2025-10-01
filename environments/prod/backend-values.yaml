@@ -1,0 +1,51 @@
+# Production environment values for backend service
+replicaCount: 3
+
+image:
+  repository: busybox
+  tag: "1.36"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+# Production-specific configurations
+env:
+  NODE_ENV: production
+  LOG_LEVEL: warn
+  DATABASE_URL: postgresql://postgres:password@database-prod:5432/microservices_prod
+  REDIS_URL: redis://redis-prod:6379
+
+# Health checks for production
+healthCheck:
+  enabled: true
+  path: /health
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Production-specific features
+features:
+  debugMode: false
+  metricsEnabled: true
+  tracingEnabled: true
+  rateLimiting: true
+  corsEnabled: true
+  securityHeaders: true
+  compression: true
+
+# Production security settings
+security:
+  corsOrigins: ["https://yourdomain.com"]
+  rateLimitRequests: 100
+  rateLimitWindow: 900
