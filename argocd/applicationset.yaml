@@ -23,36 +23,12 @@ spec:
           - environment: dev
             targetRevision: HEAD
             namespace: microservices-demo-dev
-            replicas: 1
-            resources:
-              requests:
-                cpu: 100m
-                memory: 128Mi
-              limits:
-                cpu: 500m
-                memory: 512Mi
           - environment: staging
             targetRevision: HEAD
             namespace: microservices-demo-staging
-            replicas: 2
-            resources:
-              requests:
-                cpu: 200m
-                memory: 256Mi
-              limits:
-                cpu: 1000m
-                memory: 1Gi
           - environment: prod
             targetRevision: release
             namespace: microservices-demo-prod
-            replicas: 3
-            resources:
-              requests:
-                cpu: 500m
-                memory: 512Mi
-              limits:
-                cpu: 2000m
-                memory: 2Gi
   template:
     metadata:
       name: '{{path.basename}}-{{environment}}'
@@ -106,7 +82,5 @@ spec:
       info:
         - name: Environment
           value: '{{environment}}'
-        - name: Replicas
-          value: '{{replicas}}'
-        - name: Resources
-          value: '{{resources.requests.cpu}} CPU, {{resources.requests.memory}} Memory'
+        - name: Target Revision
+          value: '{{targetRevision}}'
