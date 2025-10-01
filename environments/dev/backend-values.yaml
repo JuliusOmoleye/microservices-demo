@@ -18,6 +18,13 @@ resources:
     cpu: 50m
     memory: 64Mi
 
+# Autoscaling configuration
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
 # Development-specific configurations
 env:
   NODE_ENV: development
