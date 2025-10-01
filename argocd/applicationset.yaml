@@ -5,31 +5,41 @@ metadata:
   namespace: argocd
 spec:
   generators:
-  - git:
-      repoURL: https://github.com/JuliusOmoleye/microservices-demo.git
-      revision: HEAD
-      directories:
-      - path: charts/*
+  - matrix:
+      generators:
+      - git:
+          repoURL: https://github.com/JuliusOmoleye/microservices-demo.git
+          revision: HEAD
+          directories:
+          - path: charts/*
+      - list:
+          elements:
+          - environment: dev
+            targetRevision: HEAD
+            namespace: microservices-demo-dev
+          - environment: staging
+            targetRevision: staging
+            namespace: microservices-demo-staging
   template:
     metadata:
-      name: '{{path.basename}}-dev'
+      name: '{{path.basename}}-{{environment}}'
       labels:
         app.kubernetes.io/name: '{{path.basename}}'
         app.kubernetes.io/part-of: microservices-demo
-        environment: dev
+        environment: '{{environment}}'
     spec:
       project: default
       source:
         repoURL: https://github.com/JuliusOmoleye/microservices-demo.git
-        targetRevision: HEAD
+        targetRevision: '{{targetRevision}}'
         path: '{{path}}'
         helm:
           valueFiles:
           - values.yaml
-          - ../../environments/dev/{{path.basename}}-values.yaml
+          - ../../environments/{{environment}}/{{path.basename}}-values.yaml
       destination:
         server: https://kubernetes.default.svc
-        namespace: microservices-demo-dev
+        namespace: '{{namespace}}'
       syncPolicy:
         automated:
           prune: true
