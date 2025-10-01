@@ -3,86 +3,94 @@ kind: ApplicationSet
 metadata:
   name: microservices-demo
   namespace: argocd
+  labels:
+    app.kubernetes.io/name: microservices-demo
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/version: "1.0.0"
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   generators:
-  - list:
-      elements:
-      - service: frontend
-        environment: dev
-        namespace: microservices-demo-dev
-        targetRevision: HEAD
-      - service: frontend
-        environment: staging
-        namespace: microservices-demo-staging
-        targetRevision: HEAD
-      - service: frontend
-        environment: prod
-        namespace: microservices-demo-prod
-        targetRevision: release
-      - service: backend
-        environment: dev
-        namespace: microservices-demo-dev
-        targetRevision: HEAD
-      - service: backend
-        environment: staging
-        namespace: microservices-demo-staging
-        targetRevision: HEAD
-      - service: backend
-        environment: prod
-        namespace: microservices-demo-prod
-        targetRevision: release
-      - service: database
-        environment: dev
-        namespace: microservices-demo-dev
-        targetRevision: HEAD
-      - service: database
-        environment: staging
-        namespace: microservices-demo-staging
-        targetRevision: HEAD
-      - service: database
-        environment: prod
-        namespace: microservices-demo-prod
-        targetRevision: release
-      - service: redis
-        environment: dev
-        namespace: microservices-demo-dev
-        targetRevision: HEAD
-      - service: redis
-        environment: staging
-        namespace: microservices-demo-staging
-        targetRevision: HEAD
-      - service: redis
-        environment: prod
-        namespace: microservices-demo-prod
-        targetRevision: release
-      - service: worker
-        environment: dev
-        namespace: microservices-demo-dev
-        targetRevision: HEAD
-      - service: worker
-        environment: staging
-        namespace: microservices-demo-staging
-        targetRevision: HEAD
-      - service: worker
-        environment: prod
-        namespace: microservices-demo-prod
-        targetRevision: release
+  - matrix:
+      generators:
+      - git:
+          repoURL: https://github.com/JuliusOmoleye/microservices-demo.git
+          revision: HEAD
+          directories:
+          - path: charts/*
+      - list:
+          elements:
+          - environment: dev
+            targetRevision: HEAD
+            namespace: microservices-demo-dev
+            replicas: 1
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+          - environment: staging
+            targetRevision: HEAD
+            namespace: microservices-demo-staging
+            replicas: 2
+            resources:
+              requests:
+                cpu: 200m
+                memory: 256Mi
+              limits:
+                cpu: 1000m
+                memory: 1Gi
+          - environment: prod
+            targetRevision: release
+            namespace: microservices-demo-prod
+            replicas: 3
+            resources:
+              requests:
+                cpu: 500m
+                memory: 512Mi
+              limits:
+                cpu: 2000m
+                memory: 2Gi
   template:
     metadata:
-      name: '{{service}}-{{environment}}'
+      name: '{{path.basename}}-{{environment}}'
+      namespace: argocd
       labels:
-        app.kubernetes.io/name: '{{service}}'
+        app.kubernetes.io/name: '{{path.basename}}'
         app.kubernetes.io/part-of: microservices-demo
+        app.kubernetes.io/component: microservice
         environment: '{{environment}}'
+        tier: '{{#eq path.basename "frontend"}}frontend{{else}}{{#eq path.basename "backend"}}backend{{else}}infrastructure{{/eq}}{{/eq}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: '{{#eq path.basename "database"}}1{{else}}{{#eq path.basename "redis"}}2{{else}}3{{/eq}}{{/eq}}'
+        argocd.argoproj.io/sync-options: 'CreateNamespace=true,PrunePropagationPolicy=foreground'
     spec:
       project: default
       source:
         repoURL: https://github.com/JuliusOmoleye/microservices-demo.git
-        path: charts/{{service}}
         targetRevision: '{{targetRevision}}'
+        path: '{{path}}'
         helm:
           valueFiles:
           - values.yaml
+          - ../environments/{{environment}}/{{path.basename}}-values.yaml
+          parameters:
+          - name: environment
+            value: '{{environment}}'
+          - name: namespace
+            value: '{{namespace}}'
+          - name: replicas
+            value: '{{replicas}}'
+          - name: resources.requests.cpu
+            value: '{{resources.requests.cpu}}'
+          - name: resources.requests.memory
+            value: '{{resources.requests.memory}}'
+          - name: resources.limits.cpu
+            value: '{{resources.limits.cpu}}'
+          - name: resources.limits.memory
+            value: '{{resources.limits.memory}}'
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{namespace}}'
@@ -92,9 +100,21 @@ spec:
           selfHeal: true
         syncOptions:
         - CreateNamespace=true
+        - PrunePropagationPolicy=foreground
+        - PruneLast=true
         retry:
           limit: 5
           backoff:
             duration: 5s
             factor: 2
             maxDuration: 3m
+      revisionHistoryLimit: 10
+      ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        jsonPointers:
+        - /spec/replicas
+      - group: ""
+        kind: Service
+        jsonPointers:
+        - /spec/clusterIP
