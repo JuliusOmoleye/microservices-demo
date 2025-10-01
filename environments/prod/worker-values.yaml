@@ -1,0 +1,52 @@
+# Production environment values for worker service
+replicaCount: 3
+
+image:
+  repository: busybox
+  tag: "1.36"
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+# Production-specific configurations
+env:
+  NODE_ENV: production
+  LOG_LEVEL: warn
+  DATABASE_URL: postgresql://postgres:password@database-prod:5432/microservices_prod
+  REDIS_URL: redis://redis-prod:6379
+  WORKER_CONCURRENCY: 3
+
+# Health checks for production
+healthCheck:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Production-specific features
+features:
+  debugMode: false
+  metricsEnabled: true
+  tracingEnabled: true
+  jobRetryLimit: 5
+  jobTimeout: 1800
+
+# Worker configuration for production
+worker:
+  concurrency: 3
+  maxJobs: 50
+  retryLimit: 5
+  timeout: 1800
+
+# Production monitoring
+monitoring:
+  enabled: true
+  metricsPort: 9090
+  healthCheckInterval: 30
