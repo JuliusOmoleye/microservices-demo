@@ -3,84 +3,42 @@ kind: ApplicationSet
 metadata:
   name: microservices-demo
   namespace: argocd
-  labels:
-    app.kubernetes.io/name: microservices-demo
-    app.kubernetes.io/part-of: argocd
-    app.kubernetes.io/version: "1.0.0"
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
 spec:
   generators:
-  - matrix:
-      generators:
-      - git:
-          repoURL: https://github.com/JuliusOmoleye/microservices-demo.git
-          revision: HEAD
-          directories:
-          - path: charts/*
-      - list:
-          elements:
-          - environment: dev
-            targetRevision: HEAD
-            namespace: microservices-demo-dev
-          - environment: staging
-            targetRevision: HEAD
-            namespace: microservices-demo-staging
-          - environment: prod
-            targetRevision: release
-            namespace: microservices-demo-prod
+  - git:
+      repoURL: https://github.com/JuliusOmoleye/microservices-demo.git
+      revision: HEAD
+      directories:
+      - path: charts/*
   template:
     metadata:
-      name: '{{path.basename}}-{{environment}}'
+      name: '{{path.basename}}-dev'
       labels:
         app.kubernetes.io/name: '{{path.basename}}'
         app.kubernetes.io/part-of: microservices-demo
-        environment: '{{environment}}'
-      annotations:
-        argocd.argoproj.io/sync-wave: "1"
+        environment: dev
     spec:
       project: default
       source:
         repoURL: https://github.com/JuliusOmoleye/microservices-demo.git
-        targetRevision: '{{targetRevision}}'
+        targetRevision: HEAD
         path: '{{path}}'
         helm:
           valueFiles:
           - values.yaml
-          - ../../environments/{{environment}}/{{path.basename}}-values.yaml
+          - ../../environments/dev/{{path.basename}}-values.yaml
       destination:
         server: https://kubernetes.default.svc
-        namespace: '{{namespace}}'
+        namespace: microservices-demo-dev
       syncPolicy:
         automated:
           prune: true
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
-          - PrunePropagationPolicy=foreground
-          - PruneLast=true
         retry:
           limit: 5
           backoff:
             duration: 5s
             factor: 2
             maxDuration: 3m
-      revisionHistoryLimit: 10
-      ignoreDifferences:
-        - group: apps
-          kind: Deployment
-          jsonPointers:
-            - /spec/template/spec/containers/0/image
-            - /spec/template/spec/containers/0/command
-            - /spec/template/spec/containers/0/args
-        - group: apps
-          kind: StatefulSet
-          jsonPointers:
-            - /spec/template/spec/containers/0/image
-            - /spec/template/spec/containers/0/command
-            - /spec/template/spec/containers/0/args
-      info:
-        - name: Environment
-          value: '{{environment}}'
-        - name: Target Revision
-          value: '{{targetRevision}}'
