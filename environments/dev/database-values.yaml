@@ -19,26 +19,17 @@ resources:
     memory: 128Mi
 
 # Database configuration for development
-database:
-  name: microservices_dev
-  user: postgres
+config:
+  database: microservices_dev
+  username: postgres
+
+# Secrets (demo values - NOT for production)
+secrets:
   password: password
-  host: database-dev
-  port: 5432
 
-# Development-specific configurations
-env:
-  POSTGRES_DB: microservices_dev
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: password
-  POSTGRES_HOST: database-dev
-  POSTGRES_PORT: 5432
-
-# Persistence for development (smaller storage)
+# Persistence disabled for development (no PVC)
 persistence:
-  enabled: true
-  size: 1Gi
-  storageClass: ""
+  enabled: false
 
 # Health checks
 healthCheck:
