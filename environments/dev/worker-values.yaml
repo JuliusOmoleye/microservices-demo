@@ -1,0 +1,46 @@
+# Development environment values for worker service
+replicaCount: 1
+
+image:
+  repository: busybox
+  tag: "1.36"
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# Development-specific configurations
+env:
+  NODE_ENV: development
+  LOG_LEVEL: debug
+  DATABASE_URL: postgresql://postgres:password@database-dev:5432/microservices_dev
+  REDIS_URL: redis://redis-dev:6379
+  WORKER_CONCURRENCY: 1
+
+# Health checks for development
+healthCheck:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Development-specific features
+features:
+  debugMode: true
+  metricsEnabled: true
+  tracingEnabled: true
+  jobRetryLimit: 3
+  jobTimeout: 300
+
+# Worker configuration for development
+worker:
+  concurrency: 1
+  maxJobs: 10
+  retryLimit: 3
+  timeout: 300
