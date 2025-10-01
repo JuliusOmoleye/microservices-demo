@@ -5,27 +5,53 @@ metadata:
   namespace: argocd
 spec:
   generators:
-  - matrix:
-      generators:
-      - clusters:
-          selector:
-            matchLabels:
-              argocd.argoproj.io/secret-type: cluster
-      - list:
-          elements:
-          - environment: dev
-            namespace: microservices-demo-dev
-          - environment: staging
-            namespace: microservices-demo-staging
-          - environment: prod
-            namespace: microservices-demo-prod
-      - list:
-          elements:
-          - service: frontend
-          - service: backend
-          - service: database
-          - service: redis
-          - service: worker
+  - list:
+      elements:
+      - service: frontend
+        environment: dev
+        namespace: microservices-demo-dev
+      - service: frontend
+        environment: staging
+        namespace: microservices-demo-staging
+      - service: frontend
+        environment: prod
+        namespace: microservices-demo-prod
+      - service: backend
+        environment: dev
+        namespace: microservices-demo-dev
+      - service: backend
+        environment: staging
+        namespace: microservices-demo-staging
+      - service: backend
+        environment: prod
+        namespace: microservices-demo-prod
+      - service: database
+        environment: dev
+        namespace: microservices-demo-dev
+      - service: database
+        environment: staging
+        namespace: microservices-demo-staging
+      - service: database
+        environment: prod
+        namespace: microservices-demo-prod
+      - service: redis
+        environment: dev
+        namespace: microservices-demo-dev
+      - service: redis
+        environment: staging
+        namespace: microservices-demo-staging
+      - service: redis
+        environment: prod
+        namespace: microservices-demo-prod
+      - service: worker
+        environment: dev
+        namespace: microservices-demo-dev
+      - service: worker
+        environment: staging
+        namespace: microservices-demo-staging
+      - service: worker
+        environment: prod
+        namespace: microservices-demo-prod
   template:
     metadata:
       name: '{{service}}-{{environment}}'
@@ -44,7 +70,7 @@ spec:
           - values.yaml
           - ../environments/{{environment}}/{{service}}-values.yaml
       destination:
-        server: '{{server}}'
+        server: https://kubernetes.default.svc
         namespace: '{{namespace}}'
       syncPolicy:
         automated:
