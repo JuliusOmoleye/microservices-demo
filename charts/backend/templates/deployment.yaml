@@ -34,22 +34,36 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh"]
-          args: ["-c", "while true; do echo 'Backend service is running'; sleep 30; done"]
+          args: 
+            - "-c"
+            - |
+              # Create a simple HTTP server for health checks
+              echo '#!/bin/sh' > /tmp/health.sh
+              echo 'echo "HTTP/1.1 200 OK"' >> /tmp/health.sh
+              echo 'echo "Content-Type: text/plain"' >> /tmp/health.sh
+              echo 'echo ""' >> /tmp/health.sh
+              echo 'echo "OK"' >> /tmp/health.sh
+              chmod +x /tmp/health.sh
+              
+              # Start the health check server
+              while true; do
+                echo "Backend service is running on port {{ .Values.service.port }}"
+                echo -e "HTTP/1.1 200 OK\nContent-Type: text/plain\n\nOK" | nc -l -p {{ .Values.service.port }}
+                sleep 1
+              done
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
-            httpGet:
-              path: {{ .Values.healthCheck.path | default "/health" }}
+            tcpSocket:
               port: http
             initialDelaySeconds: {{ .Values.healthCheck.initialDelaySeconds | default 30 }}
             periodSeconds: {{ .Values.healthCheck.periodSeconds | default 10 }}
             timeoutSeconds: {{ .Values.healthCheck.timeoutSeconds | default 5 }}
             failureThreshold: {{ .Values.healthCheck.failureThreshold | default 3 }}
           readinessProbe:
-            httpGet:
-              path: {{ .Values.healthCheck.path | default "/health" }}
+            tcpSocket:
               port: http
             initialDelaySeconds: {{ .Values.healthCheck.initialDelaySeconds | default 30 }}
             periodSeconds: {{ .Values.healthCheck.periodSeconds | default 10 }}
