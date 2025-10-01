@@ -10,48 +10,63 @@ spec:
       - service: frontend
         environment: dev
         namespace: microservices-demo-dev
+        targetRevision: HEAD
       - service: frontend
         environment: staging
         namespace: microservices-demo-staging
+        targetRevision: HEAD
       - service: frontend
         environment: prod
         namespace: microservices-demo-prod
+        targetRevision: release
       - service: backend
         environment: dev
         namespace: microservices-demo-dev
+        targetRevision: HEAD
       - service: backend
         environment: staging
         namespace: microservices-demo-staging
+        targetRevision: HEAD
       - service: backend
         environment: prod
         namespace: microservices-demo-prod
+        targetRevision: release
       - service: database
         environment: dev
         namespace: microservices-demo-dev
+        targetRevision: HEAD
       - service: database
         environment: staging
         namespace: microservices-demo-staging
+        targetRevision: HEAD
       - service: database
         environment: prod
         namespace: microservices-demo-prod
+        targetRevision: release
       - service: redis
         environment: dev
         namespace: microservices-demo-dev
+        targetRevision: HEAD
       - service: redis
         environment: staging
         namespace: microservices-demo-staging
+        targetRevision: HEAD
       - service: redis
         environment: prod
         namespace: microservices-demo-prod
+        targetRevision: release
       - service: worker
         environment: dev
         namespace: microservices-demo-dev
+        targetRevision: HEAD
       - service: worker
         environment: staging
         namespace: microservices-demo-staging
+        targetRevision: HEAD
       - service: worker
         environment: prod
         namespace: microservices-demo-prod
+        targetRevision: release
   template:
     metadata:
       name: '{{service}}-{{environment}}'
@@ -64,7 +79,7 @@ spec:
       source:
         repoURL: https://github.com/JuliusOmoleye/microservices-demo.git
         path: charts/{{service}}
-        targetRevision: '{{#eq environment "prod"}}release{{else}}HEAD{{/eq}}'
+        targetRevision: '{{targetRevision}}'
         helm:
           valueFiles:
           - values.yaml
