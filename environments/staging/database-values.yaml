@@ -3,7 +3,7 @@ replicaCount: 1
 
 image:
   repository: postgres
-  tag: "15-alpine"
+  tag: "16-alpine"
   pullPolicy: IfNotPresent
 
 service:
@@ -15,30 +15,21 @@ resources:
     cpu: 500m
     memory: 512Mi
   requests:
-    cpu: 200m
+    cpu: 250m
     memory: 256Mi
 
 # Database configuration for staging
-database:
-  name: microservices_staging
-  user: postgres
-  password: password
-  host: database-staging
-  port: 5432
+config:
+  database: microservices_staging
+  username: postgres
 
-# Staging-specific configurations
-env:
-  POSTGRES_DB: microservices_staging
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: password
-  POSTGRES_HOST: database-staging
-  POSTGRES_PORT: 5432
+# Secrets (demo values - NOT for production)
+secrets:
+  password: staging123
 
-# Persistence for staging
+# Persistence disabled for staging (no PVC)
 persistence:
-  enabled: true
-  size: 5Gi
-  storageClass: ""
+  enabled: false
 
 # Health checks
 healthCheck:
@@ -53,4 +44,3 @@ features:
   backupEnabled: true
   monitoringEnabled: true
   debugLogging: false
-  sslEnabled: false
