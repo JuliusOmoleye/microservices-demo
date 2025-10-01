@@ -1,0 +1,12 @@
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+persistence:
+  enabled: true
+  size: 50Gi
+  storageClass: "fast-ssd"

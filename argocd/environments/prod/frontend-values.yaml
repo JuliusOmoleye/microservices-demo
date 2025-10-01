@@ -1,0 +1,27 @@
+replicaCount: 3
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 60
+
+ingress:
+  enabled: true
+  hosts:
+    - host: frontend-prod.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: frontend-tls
+      hosts:
+        - frontend-prod.example.com

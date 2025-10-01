@@ -1,0 +1,14 @@
+apiVersion: v2
+name: redis
+description: Redis cache service for microservices demo
+type: application
+version: 0.1.0
+appVersion: "7"
+keywords:
+  - redis
+  - cache
+  - microservices
+home: https://github.com/example/microservices-demo
+maintainers:
+  - name: Demo Team
+    email: demo@example.com

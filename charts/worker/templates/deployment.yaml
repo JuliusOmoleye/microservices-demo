@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "worker.fullname" . }}
+  labels:
+    {{- include "worker.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "worker.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "worker.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: worker
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ['sh', '-c']
+        args:
+        - |
+          echo "Worker microservice starting..."
+          echo "Database: $DB_HOST:$DB_PORT"
+          echo "Redis: $REDIS_HOST:$REDIS_PORT"
+          while true; do
+            echo "$(date): Processing background tasks..."
+            echo "$(date): Checking database connection to $DB_HOST"
+            echo "$(date): Checking redis connection to $REDIS_HOST"
+            echo "$(date): Task completed, sleeping for 30 seconds"
+            sleep 30
+          done
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        env:
+        - name: DB_HOST
+          value: {{ .Values.database.serviceName }}
+        - name: DB_PORT
+          value: "{{ .Values.database.servicePort }}"
+        - name: REDIS_HOST
+          value: {{ .Values.redis.serviceName }}
+        - name: REDIS_PORT
+          value: "{{ .Values.redis.servicePort }}"
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

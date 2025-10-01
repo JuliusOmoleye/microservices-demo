@@ -1,0 +1,62 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: microservices-demo
+  namespace: argocd
+spec:
+  generators:
+  - matrix:
+      generators:
+      - list:
+          elements:
+          - service: frontend
+          - service: backend
+          - service: database
+          - service: redis
+          - service: worker
+      - list:
+          elements:
+          - environment: dev
+            namespace: microservices-demo-dev
+            repoURL: https://github.com/example/microservices-demo
+            targetRevision: HEAD
+          - environment: staging
+            namespace: microservices-demo-staging
+            repoURL: https://github.com/example/microservices-demo
+            targetRevision: HEAD
+          - environment: prod
+            namespace: microservices-demo-prod
+            repoURL: https://github.com/example/microservices-demo
+            targetRevision: release
+  template:
+    metadata:
+      name: '{{service}}-{{environment}}'
+      labels:
+        app.kubernetes.io/name: '{{service}}'
+        app.kubernetes.io/part-of: microservices-demo
+        environment: '{{environment}}'
+    spec:
+      project: default
+      source:
+        repoURL: '{{repoURL}}'
+        targetRevision: '{{targetRevision}}'
+        path: 'charts/{{service}}'
+        helm:
+          valueFiles:
+            - values.yaml
+            - '../environments/{{environment}}/{{service}}-values.yaml'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m

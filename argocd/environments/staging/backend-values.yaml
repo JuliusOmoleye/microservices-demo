@@ -1,0 +1,12 @@
+replicaCount: 2
+
+resources:
+  limits:
+    cpu: 400m
+    memory: 384Mi
+  requests:
+    cpu: 200m
+    memory: 192Mi
+
+app:
+  environment: staging

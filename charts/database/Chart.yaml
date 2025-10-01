@@ -1,0 +1,14 @@
+apiVersion: v2
+name: database
+description: PostgreSQL database service for microservices demo
+type: application
+version: 0.1.0
+appVersion: "15"
+keywords:
+  - database
+  - postgresql
+  - microservices
+home: https://github.com/example/microservices-demo
+maintainers:
+  - name: Demo Team
+    email: demo@example.com

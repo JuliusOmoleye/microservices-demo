@@ -1,0 +1,40 @@
+replicaCount: 2
+
+image:
+  repository: node
+  tag: "18-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# Database connection configuration
+database:
+  serviceName: database
+  servicePort: 5432
+  name: "demo_db"
+  username: "demo_user"
+
+# Redis connection configuration  
+redis:
+  serviceName: redis
+  servicePort: 6379
+
+# Application configuration
+app:
+  version: "1.0.0"
+  environment: demo
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

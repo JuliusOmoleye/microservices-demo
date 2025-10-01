@@ -1,0 +1,28 @@
+replicaCount: 2
+
+image:
+  repository: busybox
+  tag: "1.36"
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 300m
+    memory: 256Mi
+  requests:
+    cpu: 150m
+    memory: 128Mi
+
+# Database connection configuration
+database:
+  serviceName: database
+  servicePort: 5432
+
+# Redis connection configuration  
+redis:
+  serviceName: redis
+  servicePort: 6379
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
