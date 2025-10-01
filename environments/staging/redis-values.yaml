@@ -3,7 +3,7 @@ replicaCount: 1
 
 image:
   repository: redis
-  tag: "7-alpine"
+  tag: "7.2-alpine"
   pullPolicy: IfNotPresent
 
 service:
@@ -12,18 +12,16 @@ service:
 
 resources:
   limits:
-    cpu: 200m
-    memory: 256Mi
+    cpu: 300m
+    memory: 384Mi
   requests:
-    cpu: 100m
-    memory: 128Mi
+    cpu: 150m
+    memory: 192Mi
 
 # Staging-specific configurations
 env:
   REDIS_PASSWORD: ""
-  REDIS_DB: 0
-  REDIS_HOST: redis-staging
-  REDIS_PORT: 6379
+  REDIS_DATABASES: 16
 
 # Health checks for staging
 healthCheck:
@@ -35,15 +33,8 @@ healthCheck:
 
 # Staging-specific features
 features:
-  persistence: true
+  persistenceEnabled: false
+  clusterMode: false
   monitoringEnabled: true
   debugLogging: false
-  maxMemory: 128mb
-
-# Redis configuration for staging
-redis:
-  maxmemory: 128mb
-  maxmemoryPolicy: allkeys-lru
-  save: "900 1 300 10 60 10000"
-  appendonly: yes
-  appendfsync: everysec
+  maxMemoryPolicy: "allkeys-lru"
