@@ -1,0 +1,58 @@
+# Production environment values for redis service
+replicaCount: 1
+
+image:
+  repository: redis
+  tag: "7-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 6379
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+# Production-specific configurations
+env:
+  REDIS_PASSWORD: ""
+  REDIS_DB: 0
+  REDIS_HOST: redis-prod
+  REDIS_PORT: 6379
+
+# Health checks for production
+healthCheck:
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Production-specific features
+features:
+  persistence: true
+  monitoringEnabled: true
+  debugLogging: false
+  maxMemory: 256mb
+  clustering: false
+
+# Redis configuration for production
+redis:
+  maxmemory: 256mb
+  maxmemoryPolicy: allkeys-lru
+  save: "900 1 300 10 60 10000"
+  appendonly: yes
+  appendfsync: everysec
+  tcpKeepalive: 60
+  timeout: 300
+
+# Production security settings
+security:
+  requirepass: ""
+  protectedMode: yes
+  tcpBacklog: 511
