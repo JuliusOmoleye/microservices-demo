@@ -1,0 +1,46 @@
+# Staging environment values for worker service
+replicaCount: 2
+
+image:
+  repository: busybox
+  tag: "1.36"
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Staging-specific configurations
+env:
+  NODE_ENV: staging
+  LOG_LEVEL: info
+  DATABASE_URL: postgresql://postgres:password@database-staging:5432/microservices_staging
+  REDIS_URL: redis://redis-staging:6379
+  WORKER_CONCURRENCY: 2
+
+# Health checks for staging
+healthCheck:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Staging-specific features
+features:
+  debugMode: false
+  metricsEnabled: true
+  tracingEnabled: true
+  jobRetryLimit: 5
+  jobTimeout: 600
+
+# Worker configuration for staging
+worker:
+  concurrency: 2
+  maxJobs: 20
+  retryLimit: 5
+  timeout: 600
