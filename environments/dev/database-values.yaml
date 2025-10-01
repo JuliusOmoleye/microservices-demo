@@ -1,0 +1,55 @@
+# Development environment values for database service
+replicaCount: 1
+
+image:
+  repository: postgres
+  tag: "15-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 5432
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Database configuration for development
+database:
+  name: microservices_dev
+  user: postgres
+  password: password
+  host: database-dev
+  port: 5432
+
+# Development-specific configurations
+env:
+  POSTGRES_DB: microservices_dev
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
+  POSTGRES_HOST: database-dev
+  POSTGRES_PORT: 5432
+
+# Persistence for development (smaller storage)
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClass: ""
+
+# Health checks
+healthCheck:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Development-specific features
+features:
+  backupEnabled: false
+  monitoringEnabled: true
+  debugLogging: true
