@@ -1,0 +1,56 @@
+# Staging environment values for database service
+replicaCount: 1
+
+image:
+  repository: postgres
+  tag: "15-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 5432
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+# Database configuration for staging
+database:
+  name: microservices_staging
+  user: postgres
+  password: password
+  host: database-staging
+  port: 5432
+
+# Staging-specific configurations
+env:
+  POSTGRES_DB: microservices_staging
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
+  POSTGRES_HOST: database-staging
+  POSTGRES_PORT: 5432
+
+# Persistence for staging
+persistence:
+  enabled: true
+  size: 5Gi
+  storageClass: ""
+
+# Health checks
+healthCheck:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Staging-specific features
+features:
+  backupEnabled: true
+  monitoringEnabled: true
+  debugLogging: false
+  sslEnabled: false
