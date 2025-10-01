@@ -1,0 +1,59 @@
+# Production environment values for frontend service
+replicaCount: 3
+
+image:
+  repository: nginx
+  tag: "1.25-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+# Production-specific configurations
+env:
+  NODE_ENV: production
+  API_URL: http://backend-prod:3000
+  DEBUG: false
+
+# Health checks for production
+healthCheck:
+  enabled: true
+  path: /health
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Production-specific features
+features:
+  hotReload: false
+  debugMode: false
+  sourceMaps: false
+  devTools: false
+  compression: true
+  caching: true
+  securityHeaders: true
+  cspEnabled: true
+
+# Autoscaling configuration for production
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Production security settings
+security:
+  cspPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+  hstsEnabled: true
+  xssProtection: true
