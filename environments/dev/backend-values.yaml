@@ -1,0 +1,41 @@
+# Development environment values for backend service
+replicaCount: 1
+
+image:
+  repository: busybox
+  tag: "1.36"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# Development-specific configurations
+env:
+  NODE_ENV: development
+  LOG_LEVEL: debug
+  DATABASE_URL: postgresql://postgres:password@database-dev:5432/microservices_dev
+  REDIS_URL: redis://redis-dev:6379
+
+# Health checks for development
+healthCheck:
+  enabled: true
+  path: /health
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Development-specific features
+features:
+  debugMode: true
+  metricsEnabled: true
+  tracingEnabled: true
