@@ -1,0 +1,64 @@
+# Production environment values for database service
+replicaCount: 1
+
+image:
+  repository: postgres
+  tag: "15-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 5432
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Database configuration for production
+database:
+  name: microservices_prod
+  user: postgres
+  password: password
+  host: database-prod
+  port: 5432
+
+# Production-specific configurations
+env:
+  POSTGRES_DB: microservices_prod
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
+  POSTGRES_HOST: database-prod
+  POSTGRES_PORT: 5432
+
+# Persistence for production
+persistence:
+  enabled: true
+  size: 20Gi
+  storageClass: ""
+
+# Health checks
+healthCheck:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Production-specific features
+features:
+  backupEnabled: true
+  monitoringEnabled: true
+  debugLogging: false
+  sslEnabled: true
+  replicationEnabled: false
+
+# Production security settings
+security:
+  sslMode: require
+  maxConnections: 100
+  sharedBuffers: 256MB
+  effectiveCacheSize: 1GB
