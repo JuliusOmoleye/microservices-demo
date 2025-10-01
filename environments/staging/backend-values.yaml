@@ -2,8 +2,8 @@
 replicaCount: 2
 
 image:
-  repository: busybox
-  tag: "1.36"
+  repository: node
+  tag: "20-alpine"
   pullPolicy: IfNotPresent
 
 service:
@@ -12,11 +12,23 @@ service:
 
 resources:
   limits:
-    cpu: 200m
-    memory: 256Mi
+    cpu: 300m
+    memory: 384Mi
   requests:
-    cpu: 100m
-    memory: 128Mi
+    cpu: 150m
+    memory: 192Mi
+
+# Service Account configuration
+serviceAccount:
+  create: true
+  name: ""
+
+# Autoscaling configuration
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
 
 # Staging-specific configurations
 env:
