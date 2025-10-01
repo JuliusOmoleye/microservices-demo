@@ -1,0 +1,49 @@
+# Development environment values for frontend service
+replicaCount: 1
+
+image:
+  repository: nginx
+  tag: "1.25-alpine"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# Development-specific configurations
+env:
+  NODE_ENV: development
+  API_URL: http://backend-dev:3000
+  DEBUG: true
+
+# Health checks for development
+healthCheck:
+  enabled: true
+  path: /health
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Development-specific features
+features:
+  hotReload: true
+  debugMode: true
+  sourceMaps: true
+  devTools: true
+
+# Autoscaling configuration for development
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
