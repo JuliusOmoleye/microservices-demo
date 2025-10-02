@@ -8,7 +8,7 @@ image:
 service:
   type: NodePort
   port: 80
-  targetPort: 31000
+  targetPort: 30808
 
 resources:
   limits:
