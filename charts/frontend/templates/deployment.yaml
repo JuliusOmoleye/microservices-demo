@@ -36,7 +36,7 @@ spec:
           periodSeconds: 5
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
-        volumeMounts:
+        # volumeMounts:
         # - name: html
         #   mountPath: /usr/share/nginx/html
         # - name: nginx-cache
@@ -67,9 +67,9 @@ spec:
       #     EOF
       #     echo "HTML generated successfully"
       #     while true; do sleep 3600; done
-        volumeMounts:
-        - name: html
-          mountPath: /usr/share/nginx/html
+        # volumeMounts:
+        # - name: html
+        #   mountPath: /usr/share/nginx/html
         resources:
           limits:
             cpu: 50m
