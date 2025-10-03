@@ -37,12 +37,12 @@ spec:
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         volumeMounts:
-        - name: html
-          mountPath: /usr/share/nginx/html
-        - name: nginx-cache
-          mountPath: /var/cache/nginx
-        - name: nginx-run
-          mountPath: /var/run
+        # - name: html
+        #   mountPath: /usr/share/nginx/html
+        # - name: nginx-cache
+        #   mountPath: /var/cache/nginx
+        # - name: nginx-run
+        #   mountPath: /var/run
         env:
         - name: BACKEND_URL
           value: "http://{{ .Values.backend.serviceName }}:{{ .Values.backend.servicePort }}"
