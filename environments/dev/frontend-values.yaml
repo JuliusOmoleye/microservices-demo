@@ -2,8 +2,8 @@
 replicaCount: 1
 
 image:
-  repository: nginx
-  tag: "1.25-alpine"
+  repository: ghcr.io/geek0ps/julius-cloud-architect-portfolio
+  tag: "main"
   pullPolicy: IfNotPresent
 
 service:
